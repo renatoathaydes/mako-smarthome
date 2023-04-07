@@ -1,0 +1,40 @@
+basePath = "/smarthome"
+-- package.loaded["database"] = nil
+-- package.loaded["timers"] = nil
+-- package.loaded["weather"] = nil
+mako.createloader(io)
+
+-- The username/password callback function.
+local function getpassword(username)
+    trace "getpassword fun"
+   if username == "admin" then return "Password" end
+end
+-- Create the username database from our getpassword func.
+local authuser = ba.create.authuser(getpassword)
+
+local function loginresponse(_ENV, authinfo)
+   if authinfo.username then
+       response:forward "/smarthome/.loginfailed.lsp"
+   end
+   response:include "/smarthome/.loginform.lsp"
+end
+
+local authenticator = ba.create.authenticator(
+    authuser,
+    { type = "form", response = loginresponse })
+
+local function handleApiCall(_ENV, path)
+   trace "handleApiCall fun"
+   paths = string.gmatch(path, "([%w_-]+)(/?)")
+   response:forward("/smarthome/.api.lsp")
+end
+
+local apiDir = ba.create.dir("api")
+apiDir:setauth(authenticator)
+dir:insertprolog(apiDir, true)
+
+local timers = require "timers"
+timers.startCollectingSensorData(5 * 60 * 1000)
+timers.startCollectingWeatherData(30 * 60 * 1000)
+
+trace 'App started'

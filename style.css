@@ -1,0 +1,19 @@
+main {
+  margin: 2em;
+  font-family: Verdana, sans-serif;
+}
+
+.top-header {
+  font-size: 3em;
+  background: #0D6986;
+  color: white;
+  margin: 0;
+  padding: 1em;  
+  font-family: 'Brush Script MT', cursive;
+  font-style: italic;
+}
+
+.chart {
+    margin: auto;
+    max-width: 70%;
+}
