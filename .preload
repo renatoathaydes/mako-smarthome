@@ -1,4 +1,5 @@
 basePath = "/smarthome"
+-- package.loaded["deconz"] = nil
 -- package.loaded["database"] = nil
 -- package.loaded["timers"] = nil
 -- package.loaded["weather"] = nil
