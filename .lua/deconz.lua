@@ -1,11 +1,13 @@
 local http = require "http"
 local conf = require "loadconf"
 
+local sensorsUrl = conf.sensorsServerUrl .. "/api/" .. conf.deconzKey .. "/sensors/"
+
 local deconz = {}
 
 function deconz.getSensorsData()
     local req = http.create()
-    local ok, err = req:request { url = "http://192.168.1.2/api/" .. conf.deconzKey .. "/sensors/" }
+    local ok, err = req:request { url = sensorsUrl }
     local data
     if ok then
         local body = req:read "*a"
