@@ -1,4 +1,7 @@
-<?lsp response:include "/smarthome/.fragments/header.html" ?>
+<?lsp
+chartsPageActive = 'active'
+response:include "/smarthome/.fragments/header.lsp"
+?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <?lsp
 

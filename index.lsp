@@ -1,5 +1,6 @@
 <?lsp
-response:include "/smarthome/.fragments/header.html"
+homePageActive = 'active'
+response:include "/smarthome/.fragments/header.lsp"
 ?>
 <table>
     <thead>

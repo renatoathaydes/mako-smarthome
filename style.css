@@ -17,3 +17,32 @@ main {
     margin: auto;
     max-width: 70%;
 }
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+nav li {
+  display: inline;
+  background: #3D7996;
+  float: left;
+}
+
+nav li.active {
+  background-color: #04AA6D;
+}
+
+nav a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 0.4em 0.6em;
+  text-decoration: none;
+}
+
+nav a:hover {
+  background-color: #111;
+}
