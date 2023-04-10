@@ -38,4 +38,6 @@ local timers = require "timers"
 timers.startCollectingSensorData(5 * 60 * 1000)
 timers.startCollectingWeatherData(30 * 60 * 1000)
 
+deconzListeners = timers.startDeconzWebSocket(5000)
+
 trace 'App started'

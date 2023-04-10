@@ -3,6 +3,7 @@ local conf = require "loadconf"
 
 local sensorsUrl = conf.sensorsServerUrl .. "/api/" .. conf.deconzKey .. "/sensors/"
 local lightsUrl = conf.sensorsServerUrl .. "/api/" .. conf.deconzKey .. "/lights/"
+local metadataUrl = conf.sensorsServerUrl .. "/api/" .. conf.deconzKey .. "/config"
 
 local deconz = {}
 
@@ -36,6 +37,10 @@ local function putJsonData(url, path, data)
    return res, err
 end
 
+local function http2ws(url)
+   return string.gsub(url, "http(s*)://", "ws://", 1)
+end
+
 function deconz.getSensorsData()
    return getJsonData(sensorsUrl)
 end
@@ -47,6 +52,34 @@ end
 function deconz.setLightState(id, on, bri, hue, sat, transitiontime)
    return putJsonData(lightsUrl, id .. '/state',
                       {on = on, bri = bri, sat = sat, transitiontime = transitiontime})
+end
+
+local wsServer = http2ws(conf.sensorsServerUrl)
+
+local function findWsPort()
+   local meta = getJsonData(metadataUrl)
+   return meta.websocketport
+end
+
+function deconz.connectWebSocket(notifier)
+   local server = wsServer .. ':' .. tostring(findWsPort())
+   local req = http.create()
+   local ok, err = req:request { url = server }
+   if not ok then req:close(); error(err) end
+   if req:status() ~= 101 then
+      trace("deCONZ server responded with unexpected status: ", req:status())
+      req:close()
+      error("deCONZ server did not open websocket: " .. server)
+   end
+   local sock = ba.socket.http2sock(req)
+   sock:event(function(s)
+         while true do
+            local data = s:read()
+            if not data then break end
+            notifier(ba.json.decode(data))
+         end
+         trace 'deCONZ Websocket terminated'
+   end)
 end
 
 return deconz
