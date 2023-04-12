@@ -7,7 +7,11 @@ local deconz = require "deconz"
 local lightsData, err = deconz.getLightsData()
 local lights, errorMessage = {}, ''
 if lightsData then
-   lights = lightsData
+   for id, data in pairs(lightsData) do
+      local st = data.state
+      lights[id] = { name = data.name, on = st.on, bri = st.bri, reachable = st.reachable,
+                     hascolor = data.hascolor, type = data.type }
+   end
 else
    errorMessage = err
 end

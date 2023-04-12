@@ -7,13 +7,25 @@ local metadataUrl = conf.sensorsServerUrl .. "/api/" .. conf.deconzKey .. "/conf
 
 local deconz = {}
 
+local function readJsonResponse(req)
+   local status = req:status()
+   local body = req:read "*a"
+   if status == 200 then
+      if string.match(req:header()['Content-Type'] or '', 'application/json') then
+         return ba.json.decode(body), nil
+      else
+         return nil, string.format('not a JSON response: %s', body)
+      end
+   end
+   return nil, string.format('bad status (%d): %s', status, body)
+end
+
 local function getJsonData(url)
    local req = http.create()
    local ok, err = req:request { url = url }
    local data
    if ok then
-      local body = req:read "*a"
-      data = ba.json.decode(body)
+      data, err = readJsonResponse(req)
    end
    req:close()
    return data, err
@@ -21,16 +33,17 @@ end
 
 local function putJsonData(url, path, data)
    local req = http.create()
+   local body = ba.json.encode(data)
    local ok, err = req:request {
       url = string.format('%s%s', url, path),
       method = "PUT",
-      header = {["Content-Type"] = "application/json"} }
+      size = #body
+   }
    local res
    if ok then
-      ok, err = req:write(ba.json.encode(data))
+      ok, err = req:write(body)
       if ok then
-         local body = req:read "*a"
-         res = ba.json.decode(body)
+         res, err = readJsonResponse(req)
       end
    end
    req:close()
