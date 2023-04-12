@@ -43,24 +43,41 @@ function createLight(id, data, webSocket) {
     const root = document.createElement('div');
     const nameSpan = document.createElement('span');
     const image = document.createElement('img');
+    const slider = createLightSlider();
     root.id = id;
     root.light = data;
-    root.classList.add('light', 'clickable');
-    root.append(nameSpan, image);
+    root.classList.add('light');
+    root.append(nameSpan, image, slider);
 
-    root.addEventListener('click', click => {
-        webSocket.send(`{"id": "${id}", "on": ${!root.light.on}}`);
+    image.classList.add('clickable');
+    image.addEventListener('click', click => {
+        webSocket.send(`{"id": "${id}", "r": "lights", "on": ${!root.light.on}}`);
+        drawLight(root, nameSpan, image, slider);
+    });
+    slider.addEventListener('change', change => {
+        webSocket.send(`{"id": "${id}", "r": "lights", "bri": ${1 * slider.value}}`);
     });
     
-    drawLight(root, nameSpan, image);
+    drawLight(root, nameSpan, image, slider);
 
     const lights = document.getElementById('lights');
     lights.append(root);
 }
 
-function drawLight(root, nameSpan, image) {
+function createLightSlider() {
+    const root = document.createElement('input');
+    root.classList.add('light-slider');
+    root.type = 'range';
+    root.min = 10;
+    root.max = 254;
+    root.step = 4;
+    return root;
+}
+
+function drawLight(root, nameSpan, image, slider) {
     nameSpan = nameSpan || root.getElementsByTagName('span')[0];
     image = image || root.getElementsByTagName('img')[0];
+    slider = slider || root.getElementsByTagName('input')[0];
     const data = root.light;
     if (data.on) {
         root.classList.add('light-on');
@@ -74,5 +91,9 @@ function drawLight(root, nameSpan, image) {
     } else {
         root.classList.remove('unreachable');
     }
+    if (data.bri != null) {
+        slider.value = data.bri;
+    }
+    slider.disabled = data.bri == null || !data.on;
     nameSpan.innerText = data.name;
 }

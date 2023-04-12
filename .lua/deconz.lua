@@ -62,9 +62,11 @@ function deconz.getLightsData()
    return getJsonData(lightsUrl)
 end
 
-function deconz.setLightState(id, on, bri, hue, sat, transitiontime)
+function deconz.setLightState(id, data)
+   -- explicitly pick only recognized fields from data
    return putJsonData(lightsUrl, id .. '/state',
-                      {on = on, bri = bri, sat = sat, transitiontime = transitiontime})
+                      {on = data.on, bri = data.bri,
+                       sat = data.sat, transitiontime = data.transitiontime})
 end
 
 local wsServer = http2ws(conf.sensorsServerUrl)

@@ -46,3 +46,19 @@ nav a {
 nav a:hover {
   background-color: #111;
 }
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  filter: drop-shadow(6px 6px 10px gray);
+}
+
+.unreachable {
+  background: orange;
+}
+
+.light-slider {
+  margin-left: 2em;
+}

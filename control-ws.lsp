@@ -35,8 +35,8 @@ local function socketHandler(listener)
          trace('socketHandler handling data: ' .. data)
          data = ba.json.decode(data)
          local response
-         if data.id and data.on ~= nil then
-            local res, err = deconz.setLightState(data.id, data.on)
+         if data.id and data.r == 'lights' then
+            local res, err = deconz.setLightState(data.id, data)
             if err then
                response = ba.json.encode { error = err }
             elseif #res == 1 and res[1].success then
