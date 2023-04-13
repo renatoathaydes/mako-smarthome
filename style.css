@@ -13,6 +13,11 @@ main {
   font-style: italic;
 }
 
+h2 {
+  border-bottom: solid lightgray 2px;
+  line-height: 2em;
+}
+
 .chart {
     margin: auto;
     max-width: 70%;

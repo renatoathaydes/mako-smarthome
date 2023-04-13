@@ -52,7 +52,7 @@ end
 
 ?>
 
-<div id='error-message' class='error'><?lsp= errorMessage ?></div>
+<div id='error-message' class='error'><?lsp= errorMessage or '' ?></div>
 <h2>Lights</h2>
 <div id='lights'></div>
 <h2>Sensors</h2>
