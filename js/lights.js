@@ -1,7 +1,21 @@
-function Lights(lightsData, webSocket) {
+function Control(lightsData, sensorsData, webSocket) {
     for (const id in lightsData) {
         const light = lightsData[id];
         createLight(id, light, webSocket);
+    }
+    // merge sensors with the same name
+    const sensorsByName = {};
+    for (const id in sensorsData) {
+        const sensor = sensorsData[id];
+        const s = sensorsByName[sensor.name] || {};
+        sensorsByName[sensor.name] = s;
+        for (const prop in sensor) {
+            s[prop] = sensor[prop];
+        }
+    }
+    for (const name in sensorsByName) {
+        const sensor = sensorsByName[name];
+        createSensor(name, sensor, webSocket);
     }
     
     webSocket.addEventListener('message', (event) => {
@@ -95,5 +109,62 @@ function drawLight(root, nameSpan, image, slider) {
         slider.value = data.bri;
     }
     slider.disabled = data.bri == null || !data.on;
+    nameSpan.innerText = data.name;
+}
+
+// common data schema: { name, type, on, reachable }
+// daylight schema:    { daylight, sunrise, sunset }
+// motion schema:      { presence }
+// temperature schema: { humidity, temperature, pressure }
+function createSensor(name, data, webSocket) {
+    const root = document.createElement('div');
+    const nameSpan = document.createElement('span');
+    const valueSpan = document.createElement('span');
+    const image = document.createElement('img');
+    root.id = name;
+    root.sensor = data;
+    root.classList.add('sensor', data.type);
+    root.append(nameSpan, image, valueSpan);
+    
+    drawSensor(root, nameSpan, image, valueSpan);
+
+    const sensors = document.getElementById('sensors');
+    sensors.append(root);
+}
+
+function drawSensor(root, nameSpan, image, valueSpan) {
+    nameSpan = nameSpan || root.getElementsByTagName('span')[0];
+    image = image || root.getElementsByTagName('img')[0];
+    valueSpan = valueSpan || root.getElementsByTagName('span')[1];
+
+    const data = root.sensor;
+    if (data.daylight != null) { // type daylight
+        root.classList.add(data.daylight ? 'daylight' : 'night');
+        image.src = '/smarthome/images/' +
+            (data.daylight ? 'sun-regular.svg' : 'moon.svg');
+        valueSpan.innerText = data.daylight ? 'DAY' : 'NIGHT';
+    } else if (data.presence != null) { // motion sensor
+        image.src = '/smarthome/images/' +
+            (data.presence ? 'person-rays-solid.svg' : 'person-solid.svg');
+        valueSpan.innerText = data.presence ? 'Motion detected' : 'Quiet';
+    } else if (data.temperature != null) { // temperature sensor
+        image.src = '/smarthome/images/temperature-half-solid.svg';
+        const texts = [];
+        texts.push(`${data.temperature}C`);
+        if (data.humidity != null) {
+            texts.push(`${data.humidity}%`);
+        }
+        if (data.pressure != null) {
+            texts.push(`${data.pressure}hP`);
+        }
+        valueSpan.innerText = texts.join(', ');
+    } else { // unknown sensor
+        valueSpan.innerText = 'Unknown';
+    }
+    if (data.unreachable) {
+        root.classList.add('unreachable');
+    } else {
+        root.classList.remove('unreachable');
+    }
     nameSpan.innerText = data.name;
 }
