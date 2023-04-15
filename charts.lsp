@@ -13,23 +13,22 @@ db.forEachWeatherEntry(function(time, humi, temp, pres, rain, snow, desc)
     table.insert(weatherData.temps, 1*temp) -- temperatures already in C
 end)
 
-local sensorData = {}
+local sensorsData = {}
 local n = 1
 db.forEachTemperature(function(time, name, value)
-    local data = sensorData[name]
+    local data = sensorsData[name]
     if not data then
         data = {temps = {}, times = {}, id = tostring(n)}
         n = n + 1
-        sensorData[name] = data
+        sensorsData[name] = data
     end
     table.insert(data.times, 1*time)
     table.insert(data.temps, value / 100) -- temperatures come in as 100 * C
-    -- response:write('<td>', ba.datetime(1*time):tostring(120), '</td>')
 end)
 
 -- write one canvas tag for each sensor
-for lname, ldata in pairs(sensorData) do
-    name, data = lname, ldata -- must be global so the included LSP page can use it
+for lname, data in pairs(sensorsData) do
+    name, sensorData = lname, data -- must be global so the included LSP page can use it
     response:include('.fragments/chart.lsp', true)
 end
 
