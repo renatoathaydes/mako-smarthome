@@ -1,12 +1,18 @@
+const lightNameById = {};
+const sensorNameById = {};
+
 function Control(lightsData, sensorsData, webSocket) {
+    // assuming only one light per name, no need to merge
     for (const id in lightsData) {
         const light = lightsData[id];
+        lightNameById[id] = light.name;
         createLight(id, light, webSocket);
     }
     // merge sensors with the same name
     const sensorsByName = {};
     for (const id in sensorsData) {
         const sensor = sensorsData[id];
+        sensorNameById[id] = sensor.name;
         const s = sensorsByName[sensor.name] || {};
         sensorsByName[sensor.name] = s;
         for (const prop in sensor) {
@@ -15,7 +21,7 @@ function Control(lightsData, sensorsData, webSocket) {
     }
     for (const name in sensorsByName) {
         const sensor = sensorsByName[name];
-        createSensor(name, sensor, webSocket);
+        createSensor('ignore-id', sensor, webSocket);
     }
     
     webSocket.addEventListener('message', (event) => {
@@ -23,9 +29,9 @@ function Control(lightsData, sensorsData, webSocket) {
         const message = JSON.parse(event.data);
         if (message.id != null) {
             if (message.type === 'changed' && message.state) {
-                createOrUpdateLight(message.id, message.state, webSocket);
+                createOrUpdateResource(message.id, message.r, message.state, webSocket);
             } else if (message.type === 'deleted') {
-                deleteLight(message.id);
+                deleteResource(message.id);
             }
         } else if (message.error) {
             document.getElementById('error-message').innerText = message.error;
@@ -35,20 +41,48 @@ function Control(lightsData, sensorsData, webSocket) {
     });
 }
 
-function updateLightState(light, data) {
-    if (data.name) light.name = data.name;
-    if (data.bri != null) light.bri = data.bri;
-    if (data.on != null) light.on = data.on;
-    if (data.reachable != null) light.reachable = data.reachable;
+function deleteResource(id) {
+    const name = lightNameById[id] || sensorNameById[id];
+    if (name) {
+        const element = document.getElementById(name);
+        if (element) element.remove();
+    }
 }
 
-function createOrUpdateLight(id, data, webSocket) {
-    const element = document.getElementById(id);
-    if (element) {
-        updateLightState(element.light, data);
-        drawLight(element);
+function createOrUpdateResource(id, resource, state, webSocket) {
+    // FIXME on create, the name won't be found, the event must provide it.
+    const name = resource === 'lights'
+          ? lightNameById[id]
+          : resource === 'sensors'
+          ? sensorNameById[id]
+          : null;
+    if (!name) return;
+    if (resource === 'lights') {
+        createOrUpdate(id, name, state, webSocket, createLight, drawLight);
+    } else if (resource === 'sensors') {
+        createOrUpdate(id, name, state, webSocket, createSensor, drawSensor);
     } else {
-        createLight(id, data, webSocket);
+        console.log('unrecognized resource:', resource, state);
+    }
+}
+
+function createOrUpdate(id, name, data, webSocket, createFun, drawFun) {
+    const element = document.getElementById(name);
+    if (element) {
+        updateState(element.state, data);
+        drawFun(element);
+    } else {
+        createFun(id, data, webSocket);
+    }
+}
+
+function updateState(state, data) {
+    const fields = ['name', 'presence', 'on', 'bri', 'reachable',
+                    'daylight', 'sunrise', 'sunset',
+                    'humidity', 'temperature', 'pressure'];
+
+    for (const field of fields) {
+        if (data[field] != null) state[field] = data[field];
     }
 }
 
@@ -58,14 +92,14 @@ function createLight(id, data, webSocket) {
     const nameSpan = document.createElement('span');
     const image = document.createElement('img');
     const slider = createLightSlider();
-    root.id = id;
-    root.light = data;
+    root.id = data.name;
+    root.state = data;
     root.classList.add('light');
     root.append(nameSpan, image, slider);
 
     image.classList.add('clickable');
     image.addEventListener('click', click => {
-        webSocket.send(`{"id": "${id}", "r": "lights", "on": ${!root.light.on}}`);
+        webSocket.send(`{"id": "${id}", "r": "lights", "on": ${!root.state.on}}`);
         drawLight(root, nameSpan, image, slider);
     });
     slider.addEventListener('change', change => {
@@ -92,7 +126,7 @@ function drawLight(root, nameSpan, image, slider) {
     nameSpan = nameSpan || root.getElementsByTagName('span')[0];
     image = image || root.getElementsByTagName('img')[0];
     slider = slider || root.getElementsByTagName('input')[0];
-    const data = root.light;
+    const data = root.state;
     if (data.on) {
         root.classList.add('light-on');
         image.src = '/smarthome/images/light-bulb-solid.svg';
@@ -116,13 +150,13 @@ function drawLight(root, nameSpan, image, slider) {
 // daylight schema:    { daylight, sunrise, sunset }
 // motion schema:      { presence }
 // temperature schema: { humidity, temperature, pressure }
-function createSensor(name, data, webSocket) {
+function createSensor(id, data, webSocket) {
     const root = document.createElement('div');
     const nameSpan = document.createElement('span');
     const valueSpan = document.createElement('span');
     const image = document.createElement('img');
-    root.id = name;
-    root.sensor = data;
+    root.id = data.name;
+    root.state = data;
     root.classList.add('sensor', data.type);
     root.append(nameSpan, image, valueSpan);
     
@@ -137,7 +171,7 @@ function drawSensor(root, nameSpan, image, valueSpan) {
     image = image || root.getElementsByTagName('img')[0];
     valueSpan = valueSpan || root.getElementsByTagName('span')[1];
 
-    const data = root.sensor;
+    const data = root.state;
     if (data.daylight != null) { // type daylight
         root.classList.add(data.daylight ? 'daylight' : 'night');
         image.src = '/smarthome/images/' +

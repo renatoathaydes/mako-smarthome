@@ -8,11 +8,10 @@ local function createDeconzEventListener(listener)
       end
       if event.id then
          local sock = listener.sock
-         if event.e == 'changed'
-            and event.r == 'lights'
-            and event.state then
+         if event.e == 'changed' and event.r and event.state then
             sock:write(ba.json.encode({
                              id = event.id,
+                             r = event.r,
                              type = 'changed',
                              state = event.state
                                      }), true)
