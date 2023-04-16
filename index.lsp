@@ -1,5 +1,6 @@
 <?lsp
 homePageActive = 'active'
+headerAdditions = '<link rel="stylesheet" href="/smarthome/js/home.css">'
 response:include "/smarthome/.fragments/header.lsp"
 
 local deconz = require "deconz"

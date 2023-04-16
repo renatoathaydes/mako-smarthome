@@ -4,6 +4,7 @@
      <meta charset="UTF-8"/>
      <title>SmartHome</title>
      <link rel="stylesheet" href="/smarthome/style.css">
+  <?lsp= headerAdditions or "" ?>
   </head>
   <body>
 <header class='top-header'>

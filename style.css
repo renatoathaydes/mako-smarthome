@@ -59,24 +59,3 @@ nav a:hover {
 .clickable:hover {
   filter: drop-shadow(6px 6px 10px gray);
 }
-
-.unreachable {
-  background: orange;
-}
-
-.light-slider {
-  margin-left: 2em;
-}
-
-.light, .sensor {
-  margin: 1em 2em 1em 0em;
-}
-
-.light > img, .sensor > img {
-  margin: 0px 2em 0 0;
-}
-
-.light > span, .sensor > span {
-  display: inline-block;
-  width: 20em;
-}

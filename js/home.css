@@ -1,0 +1,26 @@
+.unreachable {
+  background: orange;
+}
+
+.light-slider {
+  margin-left: 2em;
+}
+
+.light, .sensor {
+  margin: 1em 2em 1em 0em;
+}
+
+.light > img, .sensor > img {
+  margin: 0px 2em 0 0;
+}
+
+.light > span, .sensor > span {
+  display: inline-block;
+  width: 20em;
+}
+
+.sensor, .light {
+  display: flex;
+  align-items: center;
+  height: 7em;
+}
