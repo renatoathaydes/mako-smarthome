@@ -13,7 +13,7 @@
  <ul>
   <li class='<?lsp= homePageActive or "" ?>'><a href="/smarthome/index.lsp">Home</a></li>
   <li class='<?lsp= chartsPageActive or "" ?>'><a href="/smarthome/charts.lsp">Charts</a></li>
-  <li class='<?lsp= controlPageActive or "" ?>'><a href="/smarthome/control.lsp">Control</a></li>
+  <li class='<?lsp= automationPageActive or "" ?>'><a href="/smarthome/automation.lsp">Automation</a></li>
  </ul>
 </nav>
 <main>
