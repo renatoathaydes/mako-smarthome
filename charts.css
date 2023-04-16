@@ -1,0 +1,18 @@
+.chart-selector a {
+  color: white;
+  text-decoration: none;
+  background: #0D6986;
+  padding: 0.3em;
+}
+
+.chart-selector a:hover {
+  background: black;
+}
+
+.chart-selector a:visited {
+  color: white;
+}
+
+.chart-selector a.selected-chart {
+  background: #04AA6D;
+}
