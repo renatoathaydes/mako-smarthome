@@ -57,7 +57,7 @@ end
 <div id='lights'></div>
 <h2>Sensors</h2>
 <div id='sensors'></div>
-<script src="js/lights.js"></script>
+<script src="js/home.js"></script>
 <script>
 const lightsData = <?lsp= ba.json.encode(lights) ?>;
 const sensorsData = <?lsp= ba.json.encode(sensors) ?>;
