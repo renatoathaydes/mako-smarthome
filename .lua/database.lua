@@ -128,14 +128,24 @@ local function rows(con, sql_statement)
   end
 end
 
-local function forEach(tbl, callback)
+local twoWeeks <const> = 14 * 24 * 60 * 60
+
+local function sqlWhereDates(startTime, endTime)
+    startTime = startTime or (os.time() - twoWeeks)
+    endTime = endTime or os.time()
+    return " WHERE time <= " .. endTime .. " AND time >= " .. startTime
+end
+
+local function forEach(tbl, callback, startTime, endTime)
+    
     db.withConnection(function(con)
-        for time, name, value in rows(con, "SELECT time, name, value FROM " .. tbl) do
+        for time, name, value in rows(con,
+            "SELECT time, name, value FROM " .. tbl .. 
+            sqlWhereDates(startTime, endTime)) do
             callback(time, name, value)
         end
     end)
 end
-
 
 function db.forEachTemperature(callback)
     forEach("Temperature", callback)
@@ -149,10 +159,11 @@ function db.forEachPressure(callback)
     forEach("Pressure", callback)
 end
 
-function db.forEachWeatherEntry(callback)
+function db.forEachWeatherEntry(callback, startTime, endTime)
     db.withConnection(function(con)
         for time, humi, temp, pres, rain, snow, desc in
-        rows(con, "SELECT time, humi, temp, pres, rain, snow, desc FROM Weather") do
+        rows(con, "SELECT time, humi, temp, pres, rain, snow, desc FROM Weather" ..
+                sqlWhereDates(startTime, endTime)) do
             callback(time, humi, temp, pres, rain, snow, desc)
         end
     end)
