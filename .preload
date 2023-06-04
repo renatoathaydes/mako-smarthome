@@ -1,8 +1,8 @@
 basePath = "/smarthome"
--- package.loaded["deconz"] = nil
--- package.loaded["database"] = nil
--- package.loaded["timers"] = nil
--- package.loaded["weather"] = nil
+package.loaded["deconz"] = nil
+package.loaded["database"] = nil
+package.loaded["timers"] = nil
+package.loaded["weather"] = nil
 mako.createloader(io)
 
 -- The username/password callback function.
@@ -35,9 +35,11 @@ apiDir:setauth(authenticator)
 dir:insertprolog(apiDir, true)
 
 local timers = require "timers"
+
+-- setup a deCONZ websocket, make the listeners globally available so we can push events from anywhere 
+deconzListeners = timers.startDeconzWebSocket(5000)
+
 timers.startCollectingSensorData(5 * 60 * 1000)
 timers.startCollectingWeatherData(30 * 60 * 1000)
-
-deconzListeners = timers.startDeconzWebSocket(5000)
 
 trace 'App started'

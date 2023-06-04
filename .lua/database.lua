@@ -98,27 +98,20 @@ function db.insertData(data)
     end
 end
 
-local function insertWeatherEntry(time, humi, temp, pres, rain, snow, desc)
-    db.withConnection(function(con)
-        local query = "INSERT INTO Weather (time,humi,temp,pres,rain,snow,desc) VALUES(?,?,?,?,?,?,?)"
-        local p = con:prepare(query)
-        p:bind { {"INTEGER", time}, {"FLOAT", humi}, {"FLOAT", temp}, {"FLOAT", pres}, {"FLOAT", rain}, {"FLOAT", snow}, {"TEXT", desc} }
-        p:execute()
-    end)
+local function insertWeatherEntry(data)
+   local time, humi, temp, pres, rain, snow, desc = data.time, data.humi, data.temp, data.pres, data.rain, data.snow, data.desc
+   db.withConnection(function(con)
+         local query = "INSERT INTO Weather (time,humi,temp,pres,rain,snow,desc) VALUES(?,?,?,?,?,?,?)"
+         local p = con:prepare(query)
+         p:bind { {"INTEGER", time}, {"FLOAT", humi}, {"FLOAT", temp}, {"FLOAT", pres}, {"FLOAT", rain}, {"FLOAT", snow}, {"TEXT", desc} }
+         p:execute()
+   end)
 end
 
 --- Insert Weather Data.
 --- The data must be in the format returned by the OpenWeatherMap API.
 function db.insertWeather(data)
-    if data.cod ~= 200 then
-        trace("error inserting weather data", data)
-        return
-    end
-    local time, humi, temp, pres = data.dt, data.main.humidity, data.main.temp, data.main.pressure
-    local rain = data.rain and data.rain['1h']
-    local snow = data.snow and data.snow['1h']
-    local desc = data.weather and data.weather[1] and data.weather[1].main
-    pcall(function() insertWeatherEntry(time, humi, temp, pres, rain, snow, desc) end)
+   return pcall(function() insertWeatherEntry(data) end)
 end
 
 local function rows(con, sql_statement)

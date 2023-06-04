@@ -1,7 +1,9 @@
 const lightNameById = {};
 const sensorNameById = {};
 
-function Control(lightsData, sensorsData, webSocket) {
+function Control(lightsData, sensorsData, weatherData, webSocket) {
+    createWeatherControl(weatherData);
+    
     // assuming only one light per name, no need to merge
     for (const id in lightsData) {
         const light = lightsData[id];
@@ -41,6 +43,16 @@ function Control(lightsData, sensorsData, webSocket) {
     });
 }
 
+function createWeatherControl(data) {
+    // for now, nothing to create
+    updateWeather(data);
+}
+
+function updateWeather(data) {
+    const weather = document.getElementById('weather');
+    weather.innerText = JSON.stringify(data);
+}
+
 function deleteResource(id) {
     const name = lightNameById[id] || sensorNameById[id];
     if (name) {
@@ -50,6 +62,9 @@ function deleteResource(id) {
 }
 
 function createOrUpdateResource(id, resource, state, webSocket) {
+    if (resource === 'weather') {
+        return updateWeather(state);
+    }
     // FIXME on create, the name won't be found, the event must provide it.
     const name = resource === 'lights'
           ? lightNameById[id]

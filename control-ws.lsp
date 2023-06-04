@@ -20,7 +20,11 @@ local function createDeconzEventListener(listener)
                              id = event.id,
                              type = 'deleted'
                                      }), true)
+         else
+            --trace('unknown event kind or missing data', ba.json.encode(event))
          end
+      else
+         trace('ignoring event', ba.json.encode(event))
       end
    end
 end
