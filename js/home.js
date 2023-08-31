@@ -44,13 +44,16 @@ function Control(lightsData, sensorsData, weatherData, webSocket) {
 }
 
 function createWeatherControl(data) {
-    // for now, nothing to create
-    updateWeather(data);
-}
-
-function updateWeather(data) {
     const weather = document.getElementById('weather');
-    weather.innerText = JSON.stringify(data);
+    const time = document.createElement('div');
+    time.innerText = dateString(1000 * data.time);
+    const cond = document.createElement('div');
+    cond.innerText = 'Conditions: ' + data.desc;
+    const temp = document.createElement('div');
+    temp.innerText = 'Temperature: ' + data.temp + 'C';
+    const humi = document.createElement('div');
+    humi.innerText = 'Humidity: ' + data.humi + '%';
+    weather.append(time, cond, temp, humi);
 }
 
 function deleteResource(id) {
@@ -216,4 +219,14 @@ function drawSensor(root, nameSpan, image, valueSpan) {
         root.classList.remove('unreachable');
     }
     nameSpan.innerText = data.name;
+}
+
+function dateString(time) {
+    const now = Date.now();
+    let note = '(up-to-date)';
+    if (now > time + 60_000) {
+        const shift = (now - time) / 60_000;
+        note = `(${Math.round(shift)} minutes ago)`;
+    }
+    return new Date(time).toLocaleString() + ' ' + note;
 }
