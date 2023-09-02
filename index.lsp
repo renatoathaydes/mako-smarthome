@@ -70,9 +70,8 @@ const weatherData = <?lsp= ba.json.encode(weather.latest()) ?>;
 // start websocket connection
 const protocol = window.location.protocol;
 const host = window.location.host;
-const port = window.location.port ? ':' + window.location.port : '';
 webSocket = new WebSocket((protocol == 'http:' ? 'ws:' : 'wss:') +
-   '//' + host + port + '/smarthome/control-ws.lsp');
+   '//' + host + '/smarthome/control-ws.lsp');
 webSocket.onopen = (event) => Control(lightsData, sensorsData, weatherData, webSocket);
 </script>
 <?lsp
