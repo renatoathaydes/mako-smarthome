@@ -36,7 +36,7 @@ local function validateData(data)
 end
 
 -- Example data:
---{"coord":{"lon":17.8172,"lat":59.1954},
+--{"coord":{"lon":17.123,"lat":59.123},
 --"weather":[{"id":800,"main":"Clear","description":"clear sky","icon":"01d"}],
 --"base":"stations",
 --"main":{"temp":15.83,"feels_like":14.64,"temp_min":14.68,"temp_max":16.97,"pressure":1021,"humidity":45},

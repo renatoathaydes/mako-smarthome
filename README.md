@@ -12,8 +12,26 @@ From the [deConz-rest-plugin](https://github.com/dresden-elektronik/deconz-rest-
 
 1. Download the Mako Server binary on the Raspberry Pi.
 2. Checkout the code in this repository.
-3. Create a `mako.conf` file containing API keys and your location.
+3. Create a `mako.conf` file containing API keys and your location (see example below).
 3. Run `mako -c mako.conf -l::smarthome`.
 4. Open `http://<your-server>:<port>/smarthome/` on a browser.
 
 This assumes you already have a Raspbee/ConBee device running and the smart devices connected via the [Phoscon App](https://phoscon.de/en/raspbee2/software).
+
+### Example mako.conf
+
+```lua
+homeio='/home/renato/mako'
+
+sensorsServerUrl = "http://192.168.1.2" -- where deconz API is running
+deconzKey='<generated when you start deconz>'
+weatherApiKey='<get API key at https://openweathermap.org/>'
+latitude=37.2514795 -- location used for weather only
+longitude=-116.3766731
+```
+
+## Blog Post
+
+I wrote a [blog post](https://renato.athaydes.com/posts/writing-your-own-smarthome-manager.html) about coming up with my setup.
+
+Check it out.
