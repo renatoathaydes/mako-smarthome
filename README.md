@@ -30,6 +30,49 @@ latitude=37.2514795 -- location used for weather only
 longitude=-116.3766731
 ```
 
+## Make the server a Linux Service
+
+The Raspberry Pi needs to run the server as a deamon, so that when you restart it,
+the server is started up automatically.
+
+To do that, create a systemd service. For example:
+
+```service
+## For this file to have any effect, it should be copied as follows:
+##
+## sudo cp mako.service /etc/systemd/system/mako.service
+## sudo chmod 644 /etc/systemd/system/mako.service
+##
+## Then, start the service with 'sudo systemctl start mako'.
+## To make it also start on boot, run 'sudo systemctl enable mako'.
+##
+## See https://www.linode.com/docs/guides/start-service-at-boot/
+##
+
+[Unit]
+Description=Smarthome Mako Server
+After=network-online.target
+
+[Service]
+ExecStart=/home/renato/mako/mako
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Now, the server can be monitored as a service:
+
+```shell
+# check status
+$ systemctl status mako
+
+# restart
+$ systemctl restart mako
+
+# check the logs
+$ journalctl -u mako.service -e -f
+```
+
 ## Blog Post
 
 I wrote a [blog post](https://renato.athaydes.com/posts/writing-your-own-smarthome-manager.html) about coming up with my setup.
