@@ -51,10 +51,10 @@ local sensorsData = {}
 local n = 1
 dbForEach(function(time, name, value)
     local data = sensorsData[name]
-    if not data then
-        data = {values = {}, times = {}, id = tostring(n)}
-        n = n + 1
-        sensorsData[name] = data
+    if not data then -- initialize the data table
+       data = {values = {}, times = {}, id = tostring(n)}
+       n = n + 1
+       sensorsData[name] = data
     end
     table.insert(data.times, 1*time)
     table.insert(data.values, value/100)
