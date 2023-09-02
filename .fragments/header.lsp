@@ -3,6 +3,7 @@
   <head>
      <meta charset="UTF-8"/>
      <title>SmartHome</title>
+     <link rel="icon" type="image/x-icon" href="/smarthome/images/favicon.ico">
      <link rel="stylesheet" href="/smarthome/style.css">
   <?lsp= headerAdditions or "" ?>
   </head>
